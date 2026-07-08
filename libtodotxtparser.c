@@ -68,6 +68,21 @@ static void parse_date(const char *start, struct todotxt_date *ret_date) {
   ret_date->day = parse_int(&start[8], 2);
 }
 
+static void print_date_debug(struct todotxt_date *date) {
+  if (date == NULL || (date->year == 0 && date->month == 0 && date->day == 0)) {
+    return;
+  }
+  printf("%d-", date->year);
+  if (date->month < 10) {
+    printf("0");
+  }
+  printf("%d-", date->month);
+  if (date->day < 10) {
+    printf("0");
+  }
+  printf("%d", date->day);
+}
+
 struct da {
   char **data;
   size_t size;
@@ -414,18 +429,20 @@ int todotxt_parse_alloc(const char *buffer, size_t size,
   int rc = TODOTXT_OK;
 
   /* Set buffer_end so we never read past */
-  buffer_end = &buffer[size];
+  if (size > 0) {
+    buffer_end = &buffer[size];
+  }
 
   line = buffer;
 
-  while (line != buffer_end) {
+  while (line != buffer_end && *line != '\0') {
     /* Skip spaces */
-    for (;
-         line != buffer_end && (*line == ' ' || *line == '\t' || *line == '\n');
+    for (; line != buffer_end &&
+           (*line == ' ' || *line == '\t' || *line == '\n' || *line == '\0');
          line++)
       ;
 
-    if (line == buffer_end) {
+    if (line == buffer_end || *line == '\0') {
       break;
     }
 
@@ -494,10 +511,35 @@ void todotxt_file_free(struct todotxt_file *file) {
 
 void todotxt_print_debug(struct todotxt_file *file) {
   size_t i = 0;
+  size_t j = 0;
+
   printf("entry count: %lu\n", file->count);
   for (i = 0; i < file->count; i++) {
-    printf("entry %lu\n  desc: %s\n", i, file->entries[i].description);
-    printf("  is_completed: %d\n", file->entries[i].is_completed);
-    printf("  priority: %d\n", file->entries[i].priority);
+    printf("entry %lu\n", i);
+    printf("  description....: %s\n", file->entries[i].description);
+    printf("  is_completed...: %d\n", file->entries[i].is_completed);
+    printf("  priority.......: %d\n", file->entries[i].priority);
+    printf("  completion_date: ");
+    print_date_debug(&file->entries[i].completion_date);
+    printf("\n");
+    printf("  creation_date..: ");
+    print_date_debug(&file->entries[i].creation_date);
+    printf("\n");
+    printf("  projects.......: ");
+    for (j = 0; j < file->entries[i].project_count; j++) {
+      printf("+%s ", file->entries[i].projects[j]);
+    }
+    printf("\n");
+    printf("  contexts.......: ");
+    for (j = 0; j < file->entries[i].context_count; j++) {
+      printf("@%s ", file->entries[i].contexts[j]);
+    }
+    printf("\n");
+    printf("  tags...........: ");
+    for (j = 0; j < file->entries[i].tag_count; j++) {
+      printf("%s:%s ", file->entries[i].tags[j].key,
+             file->entries[i].tags[j].value);
+    }
+    printf("\n");
   }
 }

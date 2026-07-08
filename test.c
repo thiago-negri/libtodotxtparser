@@ -21,7 +21,7 @@
 int main(void) {
   int rc = 0;
   struct todotxt_file file = TODOTXT_FILE_ZERO;
-  rc = todotxt_parse_alloc("x (A) 2026-07-07 hello @world\nfoo", 33, &file);
+  rc = todotxt_parse_alloc("x (A) 2026-07-07 hello @world\nfoo", 0, &file);
   printf("rc = %d\n", rc);
   todotxt_print_debug(&file);
   todotxt_file_free(&file);
