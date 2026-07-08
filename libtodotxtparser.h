@@ -39,11 +39,14 @@ struct todotxt_entry {
   struct todotxt_date creation_date;
   char *description;
   char **projects;
+  size_t project_count;
   char **contexts;
+  size_t context_count;
   struct todotxt_tag *tags;
   size_t tag_count;
 };
-#define TODOTXT_ENTRY_ZERO {0, 0, TODOTXT_DATE_ZERO, TODOTXT_DATE_ZERO, NULL, NULL, NULL, NULL, 0}
+#define TODOTXT_ENTRY_ZERO                                                     \
+  {0, 0, TODOTXT_DATE_ZERO, TODOTXT_DATE_ZERO, NULL, NULL, 0, NULL, 0, NULL, 0}
 
 struct todotxt_file {
   struct todotxt_entry *entries;

@@ -78,11 +78,13 @@ struct da {
 #define TODOTXT_DA_GROW_QTY (4)
 
 static int da_grow(struct da *da) {
-  da->data = TODOTXT_REALLOC(da->data,
+  char **data_new = NULL;
+  data_new = TODOTXT_REALLOC(da->data,
                              sizeof(char *) * (da->cap + TODOTXT_DA_GROW_QTY));
-  if (da->data == NULL) {
+  if (data_new == NULL) {
     return TODOTXT_ERR_OOM;
   }
+  da->data = data_new;
   da->cap += TODOTXT_DA_GROW_QTY;
   return TODOTXT_OK;
 }
@@ -119,12 +121,12 @@ char *str_alloc(const char *start, const char *end) {
 }
 
 char **da_to_array_alloc(struct da *da) {
-  char **result = TODOTXT_REALLOC(NULL, sizeof(char *) * (da->size + 1));
+  size_t size = sizeof(char *) * da->size;
+  char **result = TODOTXT_REALLOC(NULL, size);
   if (result == NULL) {
     return NULL;
   }
-  memcpy(result, da->data, sizeof(char *) * da->size);
-  result[da->size] = NULL;
+  memcpy(result, da->data, size);
   return result;
 }
 
@@ -134,30 +136,37 @@ static void todotxt_tag_free(struct todotxt_tag *tag) {
 }
 
 static void todotxt_entry_free(struct todotxt_entry *entry) {
-  char **c = NULL;
   size_t i = 0;
 
   TODOTXT_REALLOC(entry->description, 0);
   entry->description = NULL;
 
-  for (c = entry->projects; *c != NULL; c++) {
-    TODOTXT_REALLOC(*c, 0);
+  if (entry->projects != NULL || entry->project_count > 0) {
+    for (i = 0; i < entry->project_count; i++) {
+      TODOTXT_REALLOC(entry->projects[i], 0);
+    }
+    TODOTXT_REALLOC(entry->projects, 0);
+    entry->projects = NULL;
+    entry->project_count = 0;
   }
-  TODOTXT_REALLOC(entry->projects, 0);
-  entry->projects = NULL;
 
-  for (c = entry->contexts; *c != NULL; c++) {
-    TODOTXT_REALLOC(*c, 0);
+  if (entry->contexts != NULL || entry->context_count > 0) {
+    for (i = 0; i < entry->context_count; i++) {
+      TODOTXT_REALLOC(entry->contexts[i], 0);
+    }
+    TODOTXT_REALLOC(entry->contexts, 0);
+    entry->contexts = NULL;
+    entry->context_count = 0;
   }
-  TODOTXT_REALLOC(entry->contexts, 0);
-  entry->contexts = NULL;
 
-  for (i = 0; i < entry->tag_count; i++) {
-    todotxt_tag_free(&entry->tags[i]);
+  if (entry->tags != NULL || entry->tag_count > 0) {
+    for (i = 0; i < entry->tag_count; i++) {
+      todotxt_tag_free(&entry->tags[i]);
+    }
+    TODOTXT_REALLOC(entry->tags, 0);
+    entry->tags = NULL;
+    entry->tag_count = 0;
   }
-  TODOTXT_REALLOC(entry->tags, 0);
-  entry->tags = NULL;
-  entry->tag_count = 0;
 }
 
 static int parse_line_alloc(const char *line, const char *line_end,
@@ -337,15 +346,27 @@ static int parse_line_alloc(const char *line, const char *line_end,
     rc = TODOTXT_ERR_OOM;
     goto _err;
   }
-  entry.projects = da_to_array_alloc(&projects);
-  if (entry.projects == NULL) {
-    rc = TODOTXT_ERR_OOM;
-    goto _err;
+  if (projects.size > 0) {
+    entry.projects = da_to_array_alloc(&projects);
+    if (entry.projects == NULL) {
+      rc = TODOTXT_ERR_OOM;
+      goto _err;
+    }
+    entry.project_count = projects.size;
+  } else {
+    entry.projects = NULL;
+    entry.project_count = 0;
   }
-  entry.contexts = da_to_array_alloc(&contexts);
-  if (entry.contexts == NULL) {
-    rc = TODOTXT_ERR_OOM;
-    goto _err;
+  if (contexts.size > 0) {
+    entry.contexts = da_to_array_alloc(&contexts);
+    if (entry.contexts == NULL) {
+      rc = TODOTXT_ERR_OOM;
+      goto _err;
+    }
+    entry.context_count = contexts.size;
+  } else {
+    entry.contexts = NULL;
+    entry.context_count = 0;
   }
   if (tag_keys.size > 0) {
     entry.tags =
