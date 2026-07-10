@@ -20,50 +20,72 @@
 
 #include <stdlib.h>
 
-struct todotxt_tag {
-  char *key;
-  char *value;
+struct string {
+  size_t length;
+  char *data;
 };
+#define STRING_ZERO {0, NULL}
 
-struct todotxt_date {
+struct string_array {
+  size_t count;
+  struct string *data;
+};
+#define STRING_ARRAY_ZERO {0, NULL}
+
+struct tag {
+  struct string key;
+  struct string value;
+};
+#define TAG_ZERO {STRING_ZERO, STRING_ZERO}
+
+struct tag_array {
+  size_t count;
+  struct tag *tags;
+};
+#define TAG_ARRAY_ZERO {0, NULL}
+
+struct date {
   int year;
   int month;
   int day;
 };
-#define TODOTXT_DATE_ZERO {0, 0, 0}
+#define DATE_ZERO {0, 0, 0}
 
-struct todotxt_entry {
+struct entry {
   int is_completed;
   int priority;
-  struct todotxt_date completion_date;
-  struct todotxt_date creation_date;
-  char *description;
-  char **projects;
-  size_t project_count;
-  char **contexts;
-  size_t context_count;
-  struct todotxt_tag *tags;
-  size_t tag_count;
+  struct date completion_date;
+  struct date creation_date;
+  struct string description;
+  struct string_array projects;
+  struct string_array contexts;
+  struct tag_array tags;
 };
-#define TODOTXT_ENTRY_ZERO                                                     \
-  {0, 0, TODOTXT_DATE_ZERO, TODOTXT_DATE_ZERO, NULL, NULL, 0, NULL, 0, NULL, 0}
+#define ENTRY_ZERO                                                             \
+  {0,                                                                          \
+   0,                                                                          \
+   DATE_ZERO,                                                                  \
+   DATE_ZERO,                                                                  \
+   STRING_ZERO,                                                                \
+   STRING_ARRAY_ZERO,                                                          \
+   STRING_ARRAY_ZERO,                                                          \
+   TAG_ARRAY_ZERO}
 
-struct todotxt_file {
-  struct todotxt_entry *entries;
+struct entry_array {
   size_t count;
+  struct entry *entries;
 };
-#define TODOTXT_FILE_ZERO {NULL, 0}
+#define ENTRY_ARRAY_ZERO {NULL, 0}
 
-#define TODOTXT_NO_PRIORITY (('Z' - 'A') + 1)
+#define NO_PRIORITY (('Z' - 'A') + 1)
 
-#define TODOTXT_OK 0
-#define TODOTXT_ERR_OOM 1
+#define OK 0
+#define EOOM 1
 
-int todotxt_parse_alloc(const char *buffer, size_t size,
-                        struct todotxt_file *ret_file);
+int parse(const char *buffer, size_t size, struct entry_array *ret_entry_array);
 
-void todotxt_file_free(struct todotxt_file *file);
+void entry_array_clear(struct entry_array *entry_array);
 
-void todotxt_print_debug(struct todotxt_file *file);
+void entry_array_print_debug(struct entry_array *entry_array);
 
 #endif /* __LIBTODOTXTPARSER_H__ */

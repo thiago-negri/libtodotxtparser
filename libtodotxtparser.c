@@ -16,12 +16,13 @@
  */
 
 #include "libtodotxtparser.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef TODOTXT_REALLOC
-#define TODOTXT_REALLOC _realloc
+#ifndef REALLOC
+#define REALLOC _realloc
 #endif
 
 static void *_realloc(void *p, size_t s) {
@@ -42,33 +43,78 @@ static int is_uppercase_letter(char a) { return a >= 'A' && a <= 'Z'; }
 
 static int is_digit(char a) { return a >= '0' && a <= '9'; }
 
-static int is_date(const char *start) {
-  return is_digit(start[0]) && is_digit(start[1]) && is_digit(start[2]) &&
-         is_digit(start[3]) && start[4] == '-' && is_digit(start[5]) &&
-         is_digit(start[6]) && start[7] == '-' && is_digit(start[8]) &&
-         is_digit(start[9]);
+static int is_date(struct string *string) {
+  if (string == NULL || string->length < 10) {
+    return 0;
+  }
+  return
+      /* YYYY */
+      is_digit(string->data[0]) && is_digit(string->data[1]) &&
+      is_digit(string->data[2]) && is_digit(string->data[3]) &&
+      /* - */
+      string->data[4] == '-' &&
+      /* MM */
+      is_digit(string->data[5]) && is_digit(string->data[6]) &&
+      /* - */
+      string->data[7] == '-' &&
+      /* DD */
+      is_digit(string->data[8]) && is_digit(string->data[9]);
 }
 
-static int parse_int(const char *start, size_t size) {
+static int parse_int(struct string *string) {
   size_t i = 0;
+  size_t length = 0;
   int result = 0;
+  char *data = NULL;
 
-  result = start[0] - '0';
-  for (i = 1; i < size; i++) {
+  assert(string != NULL);
+  assert(string->length > 0);
+
+  data = string->data;
+  length = string->length;
+
+  assert(is_digit(data[0]));
+  result = data[0] - '0';
+  for (i = 1; i < length; i++) {
+    assert(is_digit(data[i]));
     result *= 10;
-    result += start[i] - '0';
+    result += data[i] - '0';
   }
 
   return result;
 }
 
-static void parse_date(const char *start, struct todotxt_date *ret_date) {
-  ret_date->year = parse_int(start, 4);
-  ret_date->month = parse_int(&start[5], 2);
-  ret_date->day = parse_int(&start[8], 2);
+static void parse_date(struct string *string, struct date *ret_date) {
+  struct string slice = STRING_ZERO;
+  int year = 0;
+  int month = 0;
+  int day = 0;
+
+  assert(string != NULL);
+  assert(is_date(string));
+
+  /* (YYYY)-MM-DD */
+  slice.length = 4;
+  slice.data = string->data;
+  year = parse_int(&slice);
+
+  /* YYYY-(MM)-DD */
+  slice.length = 2;
+  slice.data = &string->data[5];
+  month = parse_int(&slice);
+
+  /* YYYY-MM-(DD) */
+  slice.length = 2;
+  slice.data = &string->data[8];
+  day = parse_int(&slice);
+
+  /* Return */
+  ret_date->year = year;
+  ret_date->month = month;
+  ret_date->day = day;
 }
 
-static void print_date_debug(struct todotxt_date *date) {
+static void print_date_debug(struct date *date) {
   if (date == NULL || (date->year == 0 && date->month == 0 && date->day == 0)) {
     return;
   }
@@ -90,18 +136,23 @@ struct da {
 };
 #define DA_ZERO {NULL, 0, 0}
 
-#define TODOTXT_DA_GROW_QTY (4)
+#define DA_GROW_QTY (4)
 
 static int da_grow(struct da *da) {
+  size_t cap_new = 0;
   char **data_new = NULL;
-  data_new = TODOTXT_REALLOC(da->data,
-                             sizeof(char *) * (da->cap + TODOTXT_DA_GROW_QTY));
+
+  assert(da != NULL);
+
+  cap_new = da->cap + DA_GROW_QTY;
+  data_new = REALLOC(da->data, sizeof(char *) * cap_new);
   if (data_new == NULL) {
-    return TODOTXT_ERR_OOM;
+    return EOOM;
   }
+
   da->data = data_new;
-  da->cap += TODOTXT_DA_GROW_QTY;
-  return TODOTXT_OK;
+  da->cap += cap_new;
+  return OK;
 }
 
 static int da_append(struct da *da, char *datum) {
