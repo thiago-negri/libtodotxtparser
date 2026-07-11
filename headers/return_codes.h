@@ -3,6 +3,5 @@
 
 #define OK 0
 #define EOOM 1
-#define EPANIC 2
 
 #endif /* __RETURN_CODES_H__ */

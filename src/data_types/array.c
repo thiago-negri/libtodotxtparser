@@ -35,7 +35,12 @@ int array_grow(size_t elem_size, size_t *capacity, void **array) {
   ASSERT(new_capacity > 0 && elem_size <= MAX_SIZE_T / new_capacity);
   new_size = elem_size * new_capacity;
 
-  new_array = REALLOC(*array, new_size);
+  if (*array == NULL) {
+    new_array = MALLOC(new_size);
+  } else {
+    new_array = REALLOC(*array, new_size);
+  }
+
   if (new_array == NULL) {
     rc = EOOM;
     goto _err;
