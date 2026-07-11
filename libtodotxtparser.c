@@ -160,25 +160,25 @@ static int da_append(struct da *da, char *datum) {
 
   if (da->size >= da->cap) {
     rc = da_grow(da);
-    if (rc != TODOTXT_OK) {
+    if (rc != OK) {
       return rc;
     }
   }
 
   da->data[da->size++] = datum;
 
-  return TODOTXT_OK;
+  return OK;
 }
 
 static void da_free(struct da *da) {
-  TODOTXT_REALLOC(da->data, 0);
+  REALLOC(da->data, 0);
   da->cap = 0;
   da->size = 0;
 }
 
 char *str_alloc(const char *start, const char *end) {
   size_t length = end - start;
-  char *str = TODOTXT_REALLOC(NULL, length);
+  char *str = REALLOC(NULL, length);
   if (str == NULL) {
     return NULL;
   }
@@ -188,7 +188,7 @@ char *str_alloc(const char *start, const char *end) {
 
 char **da_to_array_alloc(struct da *da) {
   size_t size = sizeof(char *) * da->size;
-  char **result = TODOTXT_REALLOC(NULL, size);
+  char **result = REALLOC(NULL, size);
   if (result == NULL) {
     return NULL;
   }
@@ -196,9 +196,9 @@ char **da_to_array_alloc(struct da *da) {
   return result;
 }
 
-static void todotxt_tag_free(struct todotxt_tag *tag) {
-  TODOTXT_REALLOC(tag->key, 0);
-  TODOTXT_REALLOC(tag->value, 0);
+static void todotxt_tag_free(struct tag *tag) {
+  REALLOC(tag->key, 0);
+  REALLOC(tag->value, 0);
 }
 
 static void todotxt_entry_free(struct todotxt_entry *entry) {
