@@ -8,18 +8,18 @@ SOURCE_FILE=libtodotxtparser.c
 
 # In dependency order
 HEADERS=(
-    headers/data_types/array.h
-    headers/data_types/string_view.h
-    headers/data_types/string_view_array.h
-    headers/data_types/date.h
-    headers/data_types/tag.h
-    headers/data_types/tag_array.h
-    headers/data_types/entry.h
-    headers/data_types/entry_array.h
-    headers/macros.h
-    headers/parser.h
-    headers/return_codes.h
-    headers/utils.h
+    header/data_types/array.h
+    header/data_types/string_view.h
+    header/data_types/string_view_array.h
+    header/data_types/date.h
+    header/data_types/tag.h
+    header/data_types/tag_array.h
+    header/data_types/entry.h
+    header/data_types/entry_array.h
+    header/macros.h
+    header/parser.h
+    header/return_codes.h
+    header/utils.h
   )
 
 SOURCES=$(find src/ -type f -name '*.c')
