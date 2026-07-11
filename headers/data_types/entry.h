@@ -29,4 +29,6 @@ struct entry {
 
 #define NO_PRIORITY (('Z' - 'A') + 1)
 
+void entry_deinit(struct entry *e);
+
 #endif /* __DATA_TYPES__ENTRY_H__ */

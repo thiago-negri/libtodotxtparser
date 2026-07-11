@@ -15,15 +15,16 @@
  * this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "data_types/entry_array.h"
+#include "parser.h"
 #include <stdio.h>
-#include "libtodotxtparser.h"
 
 int main(void) {
   int rc = 0;
-  struct todotxt_file file = TODOTXT_FILE_ZERO;
-  rc = todotxt_parse_alloc("x (A) 2026-07-07 hello @world\nfoo", 0, &file);
+  struct entry_array file = ENTRY_ARRAY_ZERO;
+  rc = parse_file("x (A) 2026-07-07 hello @world +pf\nfoo +pf +foo due:2026-07-12 +bar +spam", 0, &file);
   printf("rc = %d\n", rc);
-  todotxt_print_debug(&file);
-  todotxt_file_free(&file);
+  entry_array_print_debug(&file);
+  entry_array_deinit(&file);
   return 0;
 }

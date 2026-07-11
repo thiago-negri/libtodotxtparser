@@ -8,6 +8,6 @@ struct tag {
   struct string_view value;
 };
 
-#define TAG_ZERO {STRING_ZERO, STRING_ZERO}
+#define TAG_ZERO {STRING_VIEW_ZERO, STRING_VIEW_ZERO}
 
 #endif /* __DATA_TYPES__TAG_H__ */

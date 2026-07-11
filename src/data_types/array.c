@@ -77,6 +77,7 @@ int array_append(size_t elem_size, size_t *count, size_t *capacity,
   slot = (char *)(*array) + offset;
 
   memcpy(slot, elem, elem_size);
+  *count += 1;
   rc = OK;
   goto _ok;
 

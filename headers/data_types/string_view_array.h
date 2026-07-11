@@ -2,6 +2,7 @@
 #define __DATA_TYPES__STRING_VIEW_ARRAY_H__
 
 #include <stdlib.h>
+#include "string_view.h"
 
 /**
  * An array of string views.

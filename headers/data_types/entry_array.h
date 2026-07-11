@@ -1,7 +1,7 @@
 #ifndef __DATA_TYPES__ENTRY_ARRAY_H__
 #define __DATA_TYPES__ENTRY_ARRAY_H__
 
-#include "data_types/entry.h"
+#include "entry.h"
 #include <stdlib.h>
 
 struct entry_array {
@@ -10,7 +10,7 @@ struct entry_array {
   struct entry *entries;
 };
 
-#define ENTRY_ARRAY_ZERO {NULL, 0}
+#define ENTRY_ARRAY_ZERO {0, 0, NULL}
 
 void entry_array_deinit(struct entry_array *a);
 

@@ -2,6 +2,7 @@
 #define __DATA_TYPES__TAG_ARRAY_H__
 
 #include <stdlib.h>
+#include "tag.h"
 
 struct tag_array {
   size_t count;
