@@ -1,3 +1,6 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Copyright (C) 2026 Thiago Negri */
+
 #ifndef __DATA_TYPES__TAG_ARRAY_H__
 #define __DATA_TYPES__TAG_ARRAY_H__
 

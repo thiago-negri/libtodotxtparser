@@ -1,3 +1,6 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Copyright (C) 2026 Thiago Negri */
+
 #include "data_types/tag_array.h"
 #include "data_types/array.h"
 #include "data_types/tag.h"

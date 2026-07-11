@@ -1,3 +1,6 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Copyright (C) 2026 Thiago Negri */
+
 #ifndef __ARRAY_H__
 #define __ARRAY_H__
 

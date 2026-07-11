@@ -1,3 +1,6 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Copyright (C) 2026 Thiago Negri */
+
 #ifndef __MACROS_H__
 #define __MACROS_H__
 

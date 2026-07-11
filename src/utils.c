@@ -1,3 +1,6 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Copyright (C) 2026 Thiago Negri */
+
 #include "utils.h"
 #include "data_types/string_view.h"
 #include "macros.h"
